@@ -28,5 +28,30 @@ CREATE TABLE employee (
   FOREIGN KEY (manager_id) REFERENCES employee(id)
 );
 
+//Join tables
+
+CREATE TABLE join1
+  SELECT role.id, title, salary, name
+  FROM role
+  INNER JOIN department ON role.department_id = department.id;
+
+USE employeeTracker_db;
+
+CREATE TABLE join2
+  SELECT employee.id, first_name, last_name, title, name, manager_id
+  FROM employee
+  INNER JOIN join1 ON employee.role_id = join1.id;
+
+USE employeeTracker_db;
+
+CREATE TABLE allemployees
+SELECT DISTINCT manager.*
+FROM join2
+    inner join join2 manager on join2.manager_id = manager.id
+
+
+
+
+
 
 
