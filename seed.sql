@@ -4,7 +4,7 @@ USE employeeTracker_db;
 
 CREATE TABLE department (
   id INTEGER AUTO_INCREMENT,
-  name VARCHAR(30),
+  department VARCHAR(30),
   PRIMARY KEY (id)
 );
 
@@ -27,27 +27,30 @@ CREATE TABLE employee (
   FOREIGN KEY (role_id) REFERENCES role(id),
   FOREIGN KEY (manager_id) REFERENCES employee(id)
 );
+//to give values to role_id, manager_id
+UPDATE employee SET role_id = 1 WHERE id = 3;
+// INSERT valuesUSE employeeTracker_db;
+INSERT INTO role (title, salary, department_id) 
+values
+('software engineer', 150000, 4),
+('accountant', 150000, 2),
+('lawyer', 175000, 1),
+('lead engineer', 200000, 4),
+('legal team lead', 185000, 1),
+('sales lead', 100000, 3),
+('sales person', 75000, 3);
 
 //Join tables
-
-CREATE TABLE join1
-  SELECT role.id, title, salary, name
-  FROM role
-  INNER JOIN department ON role.department_id = department.id;
-
 USE employeeTracker_db;
 
-CREATE TABLE join2
-  SELECT employee.id, first_name, last_name, title, name, manager_id
-  FROM employee
-  INNER JOIN join1 ON employee.role_id = join1.id;
+SELECT employee.*, title, department, salary
+FROM employee
+INNER JOIN role
+ON employee.role_id = role.id
+INNER JOIN department
+ON role.department_id = department.id
 
-USE employeeTracker_db;
 
-CREATE TABLE allemployees
-SELECT DISTINCT manager.*
-FROM join2
-    inner join join2 manager on join2.manager_id = manager.id
 
 
 

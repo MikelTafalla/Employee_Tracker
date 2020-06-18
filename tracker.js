@@ -1,13 +1,13 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const table = require("console.table");
-const viewEmployees = require("public/allemployees.js")
-const employeesByDepartment;
-const employeesByManager;
-const addEmployee;
-const removeEmployee;
-const updateRole;
-const updateManager;
+// const viewEmployees = require("./public/allemployees.js")
+// const employeesByDepartment;
+// const employeesByManager;
+// const addEmployee;
+// const removeEmployee;
+// const updateRole;
+// const updateManager;
 // create the connection information for the sql database
 const connection = mysql.createConnection({
   host: "localhost",
@@ -19,11 +19,11 @@ const connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "",
+  password: "R.sociedad789",
   database: "employeeTracker_db"
 });
 
-// connect to the mysql server and sql database
+//connect to the mysql server and sql database
 connection.connect(function(err) {
   if (err) throw err;
   // run the start function after the connection is made to prompt the user
@@ -50,7 +50,7 @@ function runApp() {
     .then(function(response) {
       switch (response.action) {
       case "View All Employees":
-        viewEmployees;
+        viewEmployees();
         break;
 
       case "View All Employees By Department":
@@ -83,3 +83,19 @@ function runApp() {
       }
     });
 }
+
+function viewEmployees() {
+  connection.query(
+      `SELECT employee.*, title, department, salary
+      FROM employee
+      INNER JOIN role
+      ON employee.role_id = role.id
+      INNER JOIN department
+      ON role.department_id = department.id`, 
+    function(err, res) {
+      if (err) throw err;
+      console.table(res);
+      runApp();
+    }
+  )
+};
