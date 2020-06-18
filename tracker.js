@@ -24,7 +24,7 @@ const connection = mysql.createConnection({
 });
 
 //connect to the mysql server and sql database
-connection.connect(function(err) {
+connection.connect(err => {
   if (err) throw err;
   // run the start function after the connection is made to prompt the user
   runApp();
@@ -47,55 +47,78 @@ function runApp() {
         "Exit"
       ]
     })
-    .then(function(response) {
+    .then(response => {
       switch (response.action) {
-      case "View All Employees":
-        viewEmployees();
-        break;
+        case "View All Employees":
+          viewEmployees();
+          break;
 
-      case "View All Employees By Department":
-        employeesByDepartment;
-        break;
+        case "View All Employees By Department":
+          employeesByDepartment();
+          break;
 
-      case "View All Employess By Manager":
-        employeesByManager;
-        break;
+        case "View All Employess By Manager":
+          employeesByManager;
+          break;
 
-      case "Add Employee":
-        addEmployee;
-        break;
+        case "Add Employee":
+          addEmployee;
+          break;
 
-      case "Remove Employee":
-        removeEmployee;
-        break;
-        
-      case "Update Employee Role":
-        updateRole;
-        break;
-        
-      case "Update Employee Manager":
-        updateManager;
-        break;
-      
-      case "Exit":
-        connection.end();
-        break;
+        case "Remove Employee":
+          removeEmployee;
+          break;
+
+        case "Update Employee Role":
+          updateRole;
+          break;
+
+        case "Update Employee Manager":
+          updateManager;
+          break;
+
+        case "Exit":
+          connection.end();
+          break;
       }
     });
 }
+const tableMain = (`SELECT employee.*, title, department, salary
+FROM employee
+INNER JOIN role
+ON employee.role_id = role.id
+INNER JOIN department
+ON role.department_id = department.id`);
 
-function viewEmployees() {
-  connection.query(
-      `SELECT employee.*, title, department, salary
-      FROM employee
-      INNER JOIN role
-      ON employee.role_id = role.id
-      INNER JOIN department
-      ON role.department_id = department.id`, 
-    function(err, res) {
-      if (err) throw err;
-      console.table(res);
-      runApp();
-    }
+const viewEmployees = () => {
+  connection.query(tableMain, (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    runApp();
+  }
   )
 };
+
+const employeesByDepartment = () => {
+  inquirer
+    .prompt({
+      name: "action",
+      type: "list",
+      message: "What department do you want to see?",
+      choices: [
+        "Engineering",
+        "Sales",
+        "Finance",
+        "Legal"
+      ]
+    })
+    .then(response => {
+      connection.query(`${tableMain}
+      WHERE department = "${response.action}"`, (err, res) => {
+      console.table(res);
+      runApp();
+      })
+    })    
+};
+
+
