@@ -1,6 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const table = require("console.table");
+// const tableMain = require("./public/mainTable.js")
 // const viewEmployees = require("./public/allemployees.js")
 // const employeesByDepartment;
 // const employeesByManager;
@@ -50,7 +51,7 @@ function runApp() {
     .then(response => {
       switch (response.action) {
         case "View All Employees":
-          viewEmployees();
+          viewEmployees;
           break;
 
         case "View All Employees By Department":
@@ -62,7 +63,7 @@ function runApp() {
           break;
 
         case "Add Employee":
-          addEmployee;
+          addEmployee();
           break;
 
         case "Remove Employee":
@@ -83,13 +84,14 @@ function runApp() {
       }
     });
 }
-const tableMain = (`SELECT employee.*, title, department, salary
+///////////////
+const tableMain = (`SELECT employee.id, first_name, last_name, title, department, salary, manager_id
 FROM employee
 INNER JOIN role
 ON employee.role_id = role.id
 INNER JOIN department
 ON role.department_id = department.id`);
-
+/////////////
 const viewEmployees = () => {
   connection.query(tableMain, (err, res) => {
     if (err) throw err;
@@ -98,7 +100,7 @@ const viewEmployees = () => {
   }
   )
 };
-
+//////////////
 const employeesByDepartment = () => {
   inquirer
     .prompt({
@@ -120,5 +122,62 @@ const employeesByDepartment = () => {
       })
     })    
 };
-
-
+////////////////
+const addEmployee = () => {
+  inquirer
+    .prompt([
+      {
+        name: "firstName",
+        type: "input",
+        message: "Enter employee's first name:"
+      },
+      {
+        name: "lastName",
+        type: "input",
+        message: "Enter employee's last name:"
+      },
+      {
+        name: "department",
+        type: "list",
+        message: "Choose employee's department",
+        choices: [
+          "1 Legal",
+          "2 Finance",
+          "3 Sales",
+          "4 Engineering"
+        ]
+      },
+      {
+        name: "role",
+        type: "list",
+        message: "Choose employee's job position",
+        choices: [
+          "1 Software Engineer",
+          "2 Accountant",
+          "3 Lawyer",
+          "4 Lead Engineer",
+          "5 Legal Team Lead",
+          "6 Sales Lead",
+          "7 Sales Person",
+        ]
+      }
+    ])
+    .then(response => {
+      let roleCode = parseInt(response.role.charAt(0));
+      connection.query(
+        "INSERT INTO employee SET ?",
+        {
+          first_name: response.firstName,
+          last_name: response.lastName,
+          role_id: roleCode
+        }, (err, res) => {
+          if (err) throw err;
+        }
+      )
+      connection.query(tableMain, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+      })   
+    })
+};
+/////////////////

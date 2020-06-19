@@ -29,7 +29,8 @@ CREATE TABLE employee (
 );
 //to give values to role_id, manager_id
 UPDATE employee SET role_id = 1 WHERE id = 3;
-// INSERT valuesUSE employeeTracker_db;
+// INSERT values
+USE employeeTracker_db;
 INSERT INTO role (title, salary, department_id) 
 values
 ('software engineer', 150000, 4),
