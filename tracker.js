@@ -51,7 +51,7 @@ function runApp() {
     .then(response => {
       switch (response.action) {
         case "View All Employees":
-          viewEmployees;
+          viewEmployees();
           break;
 
         case "View All Employees By Department":
@@ -67,7 +67,7 @@ function runApp() {
           break;
 
         case "Remove Employee":
-          removeEmployee;
+          removeEmployee();
           break;
 
         case "Update Employee Role":
@@ -181,3 +181,29 @@ const addEmployee = () => {
     })
 };
 /////////////////
+const removeEmployee = () => {
+  //Create a variable that holds all of the current employees so dynamically the choices of inquirer are updated.
+  let activeEmployees = [];
+  connection.query(`SELECT id, first_name, last_name
+  FROM employee`, (err, res) => {
+    res.forEach(element => {
+      activeEmployees.push(`${element.id} ${element.first_name} ${element.last_name}`);
+    });
+    inquirer
+    .prompt({
+      name: "remove",
+      type: "list",
+      message: "What employee would you like to remove?",
+      choices: activeEmployees
+    })
+    .then(response => {
+      let employeeID = parseInt(response.remove.charAt(0));
+      connection.query(`DELETE FROM employee WHERE id = ${employeeID}`, (err, res) => {
+      console.table(response);
+      runApp();
+      })
+    }) 
+  });
+
+  
+}/// end remove employee function
