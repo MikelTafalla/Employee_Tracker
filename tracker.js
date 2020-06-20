@@ -177,6 +177,7 @@ const addEmployee = () => {
       connection.query(tableMain, (err, res) => {
         if (err) throw err;
         console.table(res);
+        runApp();
       })   
     })
 };
@@ -197,7 +198,12 @@ const removeEmployee = () => {
       choices: activeEmployees
     })
     .then(response => {
-      let employeeID = parseInt(response.remove.charAt(0));
+      //Do a global search for digits in the response
+      let numb = response.remove.match(/\d/g);
+      numb = numb.join("");
+      //After join the string o numbers trasnform it in number type
+      let employeeID = parseInt(numb);
+
       connection.query(`DELETE FROM employee WHERE id = ${employeeID}`, (err, res) => {
       console.table(response);
       runApp();
