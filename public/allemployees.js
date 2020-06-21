@@ -1,14 +1,17 @@
 // const mysql = require("mysql");
 // const inquirer = require("inquirer");
 // const table = require("console.table");
-// const jointables = require("./jointables.js");
+// const tableMain = require("./mainTable.js");
+// const connection = require("./connection.js");
 
-// function allEmployees() {
-//   // if there is no employees, console.log message and display questions again
 
-//   //if there are employees show table
-//   jointables;
+// const viewEmployees = () => {
+//     connection.query(tableMain, (err, res) => {
+//       if (err) throw err;
+//       console.table(res);
+//       runApp();
+//     }
+//     )
+//   };
 
-// }
-
-// module.exports = allEmployees();
+// module.exports = viewEmployees();

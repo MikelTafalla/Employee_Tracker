@@ -3,13 +3,14 @@ const inquirer = require("inquirer");
 const table = require("console.table");
 // const tableMain = require("./public/mainTable.js")
 // const viewEmployees = require("./public/allemployees.js")
+// const connection = require("./public/connection.js");
 // const employeesByDepartment;
 // const employeesByManager;
 // const addEmployee;
 // const removeEmployee;
 // const updateRole;
 // const updateManager;
-// create the connection information for the sql database
+// // create the connection information for the sql database
 const connection = mysql.createConnection({
   host: "localhost",
 
@@ -30,7 +31,8 @@ connection.connect(err => {
   // run the start function after the connection is made to prompt the user
   runApp();
 });
-// 
+
+
 function runApp() {
   inquirer
     .prompt({
@@ -71,7 +73,7 @@ function runApp() {
           break;
 
         case "Update Employee Role":
-          updateRole;
+          updateRole();
           break;
 
         case "Update Employee Manager":
@@ -91,7 +93,7 @@ INNER JOIN role
 ON employee.role_id = role.id
 INNER JOIN department
 ON role.department_id = department.id`);
-/////////////
+/////////
 const viewEmployees = () => {
   connection.query(tableMain, (err, res) => {
     if (err) throw err;
@@ -158,12 +160,12 @@ const addEmployee = () => {
           "4 Lead Engineer",
           "5 Legal Team Lead",
           "6 Sales Lead",
-          "7 Sales Person",
+          "7 Sales Person"
         ]
       }
     ])
     .then(response => {
-      let roleCode = parseInt(response.role.charAt(0));
+      let roleCode = parseInt(response.role);
       connection.query(
         "INSERT INTO employee SET ?",
         {
@@ -199,10 +201,7 @@ const removeEmployee = () => {
     })
     .then(response => {
       //Do a global search for digits in the response
-      let numb = response.remove.match(/\d/g);
-      numb = numb.join("");
-      //After join the string o numbers trasnform it in number type
-      let employeeID = parseInt(numb);
+      let employeeID = parseInt(response.remove)
 
       connection.query(`DELETE FROM employee WHERE id = ${employeeID}`, (err, res) => {
       console.table(response);
@@ -210,6 +209,53 @@ const removeEmployee = () => {
       })
     }) 
   });
-
-  
+ 
 }/// end remove employee function
+
+/////////////
+const updateRole = () => {
+  let employees = [];
+  connection.query(`SELECT id, first_name, last_name
+  FROM employee`, (err, res) => {
+    res.forEach(element => {
+      employees.push(`${element.id} ${element.first_name} ${element.last_name}`);
+    });
+  inquirer
+    .prompt([
+      {
+        name: "update",
+        type: "list",
+        message: "Choose the employee whose role is to be updated:",
+        choices: employees
+      },
+      {
+        name: "role",
+        type: "list",
+        message: "Choose employee's job position",
+        choices: [
+          "1 Software Engineer",
+          "2 Accountant",
+          "3 Lawyer",
+          "4 Lead Engineer",
+          "5 Legal Team Lead",
+          "6 Sales Lead",
+          "7 Sales Person"
+        ]
+      }
+    ])
+    .then(response => {
+      let idCode = parseInt(response.update);
+      let roleCode = parseInt(response.role);
+      connection.query(
+        `UPDATE employee SET role_id = ${roleCode} WHERE id = ${idCode}`, (err, res) => {
+          if (err) throw err;
+        }
+      )
+      connection.query(tableMain, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        runApp();
+      })   
+    })
+  });
+} //end update function
