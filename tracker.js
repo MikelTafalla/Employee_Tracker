@@ -115,17 +115,17 @@ const viewEmployees = () => {
 };
 //////////////
 const employeesByDepartment = () => {
+  let dpt = [];
+    connection.query(`SELECT * FROM department`, (err, res) => {
+      res.forEach(element => {
+        dpt.push(`${element.department}`);
+      });
   inquirer
     .prompt({
       name: "action",
       type: "list",
       message: "What department do you want to see?",
-      choices: [
-        "Engineering",
-        "Sales",
-        "Finance",
-        "Legal"
-      ]
+      choices: dpt
     })
     .then(response => {
       connection.query(`${tableMain}
@@ -133,7 +133,8 @@ const employeesByDepartment = () => {
       console.table(res);
       runApp();
       })
-    })    
+    })
+  })      
 };
 /////////////////
 const viewDepartments = () => {
@@ -327,9 +328,14 @@ const removeEmployee = () => {
 const updateRole = () => {
   let employees = [];
   connection.query(`SELECT id, first_name, last_name
-  FROM employee AND role`, (err, res) => {
+  FROM employee`, (err, res) => {
     res.forEach(element => {
       employees.push(`${element.id} ${element.first_name} ${element.last_name}`);
+    });
+  let job = [];
+  connection.query(`SELECT id, title FROM role`, (err, res) => {
+    res.forEach(element => {
+      job.push(`${element.id} ${element.title}`);
     });
   inquirer
     .prompt([
@@ -343,15 +349,7 @@ const updateRole = () => {
         name: "role",
         type: "list",
         message: "Choose employee's job position",
-        choices: [
-          "1 Software Engineer",
-          "2 Accountant",
-          "3 Lawyer",
-          "4 Lead Engineer",
-          "5 Legal Team Lead",
-          "6 Sales Lead",
-          "7 Sales Person"
-        ]
+        choices: job
       }
     ])
     .then(response => {
@@ -368,5 +366,6 @@ const updateRole = () => {
         runApp();
       })   
     })
-  });
+  })
+})
 } //end update function
