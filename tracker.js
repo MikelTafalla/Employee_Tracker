@@ -1,15 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const table = require("console.table");
-// const tableMain = require("./public/mainTable.js")
-// const viewEmployees = require("./public/allemployees.js")
-// const connection = require("./public/connection.js");
-// const employeesByDepartment;
-// const employeesByManager;
-// const addEmployee;
-// const removeEmployee;
-// const updateRole;
-// const updateManager;
+
 // // create the connection information for the sql database
 const connection = mysql.createConnection({
   host: "localhost",
@@ -42,10 +34,12 @@ function runApp() {
       choices: [
         "View All Employees",
         "View All Employees By Department",
-        "View All Employess By Manager",
+        "View Company Departments",
+        "View Company Job Positions",
         "Add Employee",
         "Remove Employee",
         "Update Employee Role",
+        "View All Employess By Manager",
         "Update Employee Manager",
         "Exit"
       ]
@@ -60,8 +54,12 @@ function runApp() {
           employeesByDepartment();
           break;
 
-        case "View All Employess By Manager":
-          employeesByManager;
+        case "View Company Departments":
+          viewDepartments();
+          break;
+        
+        case "View Company Job Positions":
+          viewRoles();
           break;
 
         case "Add Employee":
@@ -74,6 +72,10 @@ function runApp() {
 
         case "Update Employee Role":
           updateRole();
+          break;
+        
+        case "View All Employess By Manager":
+          employeesByManager;
           break;
 
         case "Update Employee Manager":
@@ -99,8 +101,7 @@ const viewEmployees = () => {
     if (err) throw err;
     console.table(res);
     runApp();
-  }
-  )
+  })
 };
 //////////////
 const employeesByDepartment = () => {
@@ -124,6 +125,20 @@ const employeesByDepartment = () => {
       })
     })    
 };
+/////////////////
+const viewDepartments = () => {
+  connection.query(`SELECT * FROM department`, (err, res) => {
+    console.table(res);
+    runApp();
+  })
+}//end function viewDepartments
+////////////////
+const viewRoles = () => {
+  connection.query(`SELECT * FROM role`, (err, res) => {
+    console.table(res);
+    runApp();
+  })
+}
 ////////////////
 const addEmployee = () => {
   inquirer
@@ -216,7 +231,7 @@ const removeEmployee = () => {
 const updateRole = () => {
   let employees = [];
   connection.query(`SELECT id, first_name, last_name
-  FROM employee`, (err, res) => {
+  FROM employee AND role`, (err, res) => {
     res.forEach(element => {
       employees.push(`${element.id} ${element.first_name} ${element.last_name}`);
     });
