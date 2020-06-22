@@ -37,6 +37,8 @@ function runApp() {
         "View Company Departments",
         "View Company Job Positions",
         "Add Employee",
+        "Add New Job Position to the Company",
+        "Add New Department to the Company",
         "Remove Employee",
         "Update Employee Role",
         "View All Employess By Manager",
@@ -61,9 +63,17 @@ function runApp() {
         case "View Company Job Positions":
           viewRoles();
           break;
-
+          
         case "Add Employee":
           addEmployee();
+          break;
+
+        case "Add New Job Position to the Company":
+          addRole();
+          break;
+
+        case "Add New Department to the Company":
+          addDepartment();
           break;
 
         case "Remove Employee":
@@ -141,6 +151,16 @@ const viewRoles = () => {
 }
 ////////////////
 const addEmployee = () => {
+  let dpt = [];
+    connection.query(`SELECT * FROM department`, (err, res) => {
+      res.forEach(element => {
+        dpt.push(`${element.id} ${element.department}`);
+      });
+  let job = [];
+  connection.query(`SELECT id, title FROM role`, (err, res) => {
+    res.forEach(element => {
+      job.push(`${element.id} ${element.title}`);
+    });
   inquirer
     .prompt([
       {
@@ -157,26 +177,13 @@ const addEmployee = () => {
         name: "department",
         type: "list",
         message: "Choose employee's department",
-        choices: [
-          "1 Legal",
-          "2 Finance",
-          "3 Sales",
-          "4 Engineering"
-        ]
+        choices: dpt
       },
       {
         name: "role",
         type: "list",
         message: "Choose employee's job position",
-        choices: [
-          "1 Software Engineer",
-          "2 Accountant",
-          "3 Lawyer",
-          "4 Lead Engineer",
-          "5 Legal Team Lead",
-          "6 Sales Lead",
-          "7 Sales Person"
-        ]
+        choices: job
       }
     ])
     .then(response => {
@@ -196,6 +203,95 @@ const addEmployee = () => {
         console.table(res);
         runApp();
       })   
+    })
+  })
+  })
+};
+/////////////////
+const addRole = () => {
+  inquirer.prompt(
+    {
+      name: "validation",
+      type: "input",
+      message: "Please make sure the department for this Role already exists. Have you already added its department? Y/N:"
+    }
+  ).then(response => {
+    const userResp = response.validation.toLowerCase();
+    if (userResp === "n" || userResp === "no") {
+      runApp();
+    } else if (userResp === "y" || userResp === "yes") {
+      enterRole();
+    };
+  })
+};
+const enterRole = () => {
+  let dpt = [];
+    connection.query(`SELECT * FROM department`, (err, res) => {
+      res.forEach(element => {
+        dpt.push(`${element.id} ${element.department}`);
+      });
+      inquirer
+      .prompt([
+      {
+        name: "role",
+        type: "input",
+        message: "Enter the title of the new position:"
+      },
+      {
+        name: "depart",
+        type: "list",
+        message: "Choose the department for this position:",
+        choices: dpt
+      },
+      {
+        name: "salary",
+        type: "input",
+        message: "Enter the salary of the new position:"
+      }
+    ])
+    .then(response => {
+      connection.query(
+        "INSERT INTO role SET ?",
+        {
+          title: response.role,
+          salary: response.salary,
+          department_id: parseInt(response.depart)
+        }, (err, res) => {
+          if (err) throw err;
+          console.log(`Added ${response.role} role`)
+        }
+      )
+      connection.query(`SELECT * FROM role`, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        runApp();
+      })  
+    }) 
+  })
+};
+/////////////////
+const addDepartment = () => {
+  inquirer
+    .prompt(
+      {
+        name: "department",
+        type: "input",
+        message: "Enter the name of the new department:"
+      }
+    )
+    .then(response => {
+      connection.query(
+        "INSERT INTO department SET ?",
+        {
+          department: response.department
+        }, (err, res) => {
+          if (err) throw err;
+          console.log(`Added ${response.department} department`)
+        })
+        connection.query(`SELECT * FROM department`, (err, res) => {
+        console.table(res);
+        runApp();
+        })   
     })
 };
 /////////////////
