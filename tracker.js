@@ -105,9 +105,14 @@ INNER JOIN role
 ON employee.role_id = role.id
 INNER JOIN department
 ON role.department_id = department.id`);
-/////////
+const bonusTable = (`SELECT e.id, e.first_name, e.last_name, role.title, role.salary ,d.department,
+CONCAT(m.first_name,' ',m.last_name) AS Manager
+FROM employee e
+LEFT JOIN employee m ON m.id = e.manager_id JOIN role
+JOIN department d on role.department_id = d.id and e.role_id = role.id`);
+/////////////
 const viewEmployees = () => {
-  connection.query(tableMain, (err, res) => {
+  connection.query(bonusTable, (err, res) => {
     if (err) throw err;
     console.table(res);
     runApp();
@@ -118,7 +123,7 @@ const employeesByDepartment = () => {
   let dpt = [];
     connection.query(`SELECT * FROM department`, (err, res) => {
       res.forEach(element => {
-        dpt.push(`${element.department}`);
+        dpt.push(element.department);
       });
   inquirer
     .prompt({
@@ -128,7 +133,7 @@ const employeesByDepartment = () => {
       choices: dpt
     })
     .then(response => {
-      connection.query(`${tableMain}
+      connection.query(`${bonusTable}
       WHERE department = "${response.action}"`, (err, res) => {
       console.table(res);
       runApp();
@@ -162,6 +167,11 @@ const addEmployee = () => {
     res.forEach(element => {
       job.push(`${element.id} ${element.title}`);
     });
+  let manager = [];
+  connection.query(`SELECT id, first_name, last_name FROM employee`, (err, res) => {
+    res.forEach(element => {
+      manager.push(`${element.id} ${element.first_name} ${element.last_name}`);
+    });
   inquirer
     .prompt([
       {
@@ -185,26 +195,35 @@ const addEmployee = () => {
         type: "list",
         message: "Choose employee's job position",
         choices: job
+      },
+      {
+        name: "manager",
+        type: "list",
+        message: "Choose the manager of this employee:",
+        choices: manager
       }
     ])
     .then(response => {
       let roleCode = parseInt(response.role);
+      let managerCode = parseInt(response.manager);
       connection.query(
         "INSERT INTO employee SET ?",
         {
           first_name: response.firstName,
           last_name: response.lastName,
-          role_id: roleCode
+          role_id: roleCode,
+          manager_id: managerCode
         }, (err, res) => {
           if (err) throw err;
         }
       )
-      connection.query(tableMain, (err, res) => {
+      connection.query(bonusTable, (err, res) => {
         if (err) throw err;
         console.table(res);
         runApp();
       })   
     })
+  })
   })
   })
 };
@@ -360,7 +379,7 @@ const updateRole = () => {
           if (err) throw err;
         }
       )
-      connection.query(tableMain, (err, res) => {
+      connection.query(bonusTable, (err, res) => {
         if (err) throw err;
         console.table(res);
         runApp();
