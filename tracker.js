@@ -394,6 +394,7 @@ const employeesByManager = () => {
     res.forEach(element => {
       manager.push(element.manager);
     })
+
     inquirer
       .prompt({
         name: "action",
@@ -454,7 +455,7 @@ const viewBudget = () => {
   let dpt = [];
   connection.query(`SELECT * FROM department`, (err, res) => {
     res.forEach(element => {
-      dpt.push(`${element.id} ${element.department}`);
+      dpt.push(`${element.department}`);
     })
     inquirer
       .prompt(
@@ -466,12 +467,12 @@ const viewBudget = () => {
         }
       )
       .then(response => {
-        connection.query(`SELECT salary FROM role WHERE department_id = ${parseInt(response.budget)}`, (err, resp) => {
+        connection.query(`SELECT salary FROM (${bonusTable}) AS managerSubTable WHERE department = "${response.budget}"`, (err, resp) => {
           let sum = 0;
           resp.forEach(element => {
             sum += element.salary;
           })
-          connection.query(`SELECT department FROM department WHERE id = ${parseInt(response.budget)}`, (err, res) => {
+          connection.query(`SELECT department FROM department WHERE department = "${response.budget}"`, (err, res) => {
             if (err) throw err;
             console.table(res);
             console.log(`budget of $${sum}`)
