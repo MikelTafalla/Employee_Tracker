@@ -43,6 +43,7 @@ function runApp() {
         "Update Employee Role",
         "View All Employess By Manager",
         "Update Employee Manager",
+        "View budget spent on department",
         "Exit"
       ]
     })
@@ -85,11 +86,15 @@ function runApp() {
           break;
         
         case "View All Employess By Manager":
-          employeesByManager;
+          employeesByManager();
           break;
 
         case "Update Employee Manager":
-          updateManager;
+          updateManager();
+          break;
+        
+        case "View budget spent on department":
+          viewBudget();
           break;
 
         case "Exit":
@@ -105,11 +110,7 @@ INNER JOIN role
 ON employee.role_id = role.id
 INNER JOIN department
 ON role.department_id = department.id`);
-const bonusTable = (`SELECT e.id, e.first_name, e.last_name, role.title, role.salary ,d.department,
-CONCAT(m.first_name,' ',m.last_name) AS Manager
-FROM employee e
-LEFT JOIN employee m ON m.id = e.manager_id JOIN role
-JOIN department d on role.department_id = d.id and e.role_id = role.id`);
+const bonusTable = `SELECT e.id, e.first_name, e.last_name, role.title, role.salary ,d.department, CONCAT(m.first_name,' ',m.last_name) AS manager FROM employee e LEFT JOIN employee m ON m.id = e.manager_id JOIN role JOIN department d on role.department_id = d.id and e.role_id = role.id`
 /////////////
 const viewEmployees = () => {
   connection.query(bonusTable, (err, res) => {
@@ -388,3 +389,60 @@ const updateRole = () => {
   })
 })
 } //end update function
+////////////////
+const employeesByManager = () => {
+  let manager = [];
+    connection.query(`SELECT * FROM (${bonusTable}) AS managerSubTable WHERE Manager IS NOT NULL`, (err, res) => {
+      res.forEach(element => {
+        manager.push(element.manager);
+      })
+
+  inquirer
+    .prompt({
+      name: "action",
+      type: "list",
+      message: "What manager's employees do you want to see?",
+      choices: manager
+    })
+    .then(response => {
+      console.log({queryString: `${bonusTable} WHERE manager = "${response.action}"`})
+      connection.query(`SELECT * FROM (${bonusTable}) AS managerSubTable WHERE manager = "${response.action}"`, (err, res) => {
+        console.log(res)
+      console.table(res);
+      runApp();
+      })
+    })
+  })      
+}
+////////////
+const updateManager = () => {
+
+}
+//////////
+const viewBudget = () => {
+  let dpt = [];
+    connection.query(`SELECT * FROM department`, (err, res) => {
+      res.forEach(element => {
+        dpt.push(`${element.id} ${element.department}`);
+      })
+    inquirer
+    .prompt(
+        {
+          name: "budget",
+          type: "list",
+          message: "Choose which department budget you want to see:",
+          choices: dpt
+        }
+      )
+      .then(response => {
+        connection.query(`SELECT salary FROM role WHERE department_id = ${parseInt(response.budget)}`,(err, resp) => {
+          let sum = 0;
+          resp.forEach(element => {
+            sum += element.salary;
+          })
+          console.table(sum);
+        })
+        runApp();
+    })
+  })
+}/// end function viewbudget
