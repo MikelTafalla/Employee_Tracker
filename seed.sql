@@ -51,6 +51,20 @@ ON employee.role_id = role.id
 INNER JOIN department
 ON role.department_id = department.id
 
+//modify constraint to be able to delete employees
+ALTER TABLE employee
+DROP FOREIGN KEY employee_ibfk_2;
+
+//after droppin adding back with property ON DELETE SET NULL
+SELECT * FROM employeeTracker_db.employee;
+ALTER TABLE employee 
+  ADD CONSTRAINT employee_ibfk_2
+  FOREIGN KEY (manager_id) 
+  REFERENCES employee(id) 
+  ON DELETE SET NULL;
+
+
+
 
 
 
