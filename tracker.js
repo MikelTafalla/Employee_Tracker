@@ -24,6 +24,7 @@ connection.connect(err => {
   runApp();
 });
 
+//Start app
 function runApp() {
   inquirer
     .prompt({
@@ -103,6 +104,7 @@ function runApp() {
     });
 }
 ///////////////
+//Joined table that will display all info
 const bonusTable = `SELECT e.id, e.first_name, e.last_name, role.title, role.salary ,d.department, CONCAT(m.first_name,' ',m.last_name) AS manager FROM employee e LEFT JOIN employee m ON m.id = e.manager_id JOIN role JOIN department d on role.department_id = d.id and e.role_id = role.id`
 /////////////
 const viewEmployees = () => {
@@ -114,6 +116,7 @@ const viewEmployees = () => {
 };
 //////////////
 const employeesByDepartment = () => {
+  //Create choices for inquirer question dynamically
   let dpt = [];
   connection.query(`SELECT * FROM department`, (err, res) => {
     res.forEach(element => {
@@ -198,6 +201,7 @@ const addEmployee = () => {
             }
           ])
           .then(response => {
+            //Get id numbers from answers to use them as reference
             let roleCode = parseInt(response.role);
             let managerCode = parseInt(response.manager);
             connection.query(
@@ -223,6 +227,7 @@ const addEmployee = () => {
 };
 /////////////////
 const addRole = () => {
+  //validation before asking the questions. We want to have the department created before we create a new role.
   inquirer.prompt(
     {
       name: "validation",
