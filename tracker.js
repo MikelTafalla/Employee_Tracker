@@ -394,13 +394,14 @@ const employeesByManager = () => {
     res.forEach(element => {
       manager.push(element.manager);
     })
-
+    //delete duplicate managers from arrays
+    let nonDuplicate = [...new Set(manager)]
     inquirer
       .prompt({
         name: "action",
         type: "list",
         message: "What manager's employees do you want to see?",
-        choices: manager
+        choices: nonDuplicate
       })
       .then(response => {
         connection.query(`SELECT * FROM (${bonusTable}) AS managerSubTable WHERE manager = "${response.action}"`, (err, res) => {
@@ -455,7 +456,7 @@ const viewBudget = () => {
   let dpt = [];
   connection.query(`SELECT * FROM department`, (err, res) => {
     res.forEach(element => {
-      dpt.push(`${element.department}`);
+      dpt.push(element.department);
     })
     inquirer
       .prompt(
