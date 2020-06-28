@@ -1,7 +1,7 @@
 # Employee_Tracker
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/MikelTafalla/Employee_Tracker?logo=github)
-![GitHub top language](https://img.shields.io/github/languages/top/MikelTafalla/Note_Taker?color=green&logo=github&logoColor=green)
+![GitHub top language](https://img.shields.io/github/languages/top/MikelTafalla/Employee_Tracker?color=green&logo=github&logoColor=green)
 ![GitHub language count](https://img.shields.io/github/languages/count/MikelTafalla/Employee_Tracker?color=green&logo=github&logoColor=green)
 
 App for business to be able to view and manage the departments, roles, and employees in their company so that they can organize and plan their business better.
